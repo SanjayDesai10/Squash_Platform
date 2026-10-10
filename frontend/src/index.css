@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════
-   SQUASH — Design System
+   THE BALL ROOM - Design System
    Premium sports-tech aesthetic with dark mode foundation
    ═══════════════════════════════════════════════════════════ */
 
@@ -17,7 +17,14 @@
   --color-text-muted: #666666;
   --color-text-accent: #c8ff00;
 
+  /* Accent: `accent` is the brand lime used for fills (buttons, chips,
+     badges); `accent-ink` is the accent for text, lines and borders.
+     They are the same in dark mode; light mode uses a deeper lime for
+     ink so it stays readable on white. */
   --color-accent: #c8ff00;
+  --color-accent-ink: #c8ff00;
+  --color-accent-hover: #b4e600;
+  --color-on-accent: #0a0a0a;
   --color-accent-dim: #a3cc00;
   --color-accent-glow: rgba(200, 255, 0, 0.15);
   --color-accent-subtle: rgba(200, 255, 0, 0.08);
@@ -30,9 +37,53 @@
   --color-unavailable-text: #555555;
   --color-success: #00cc88;
   --color-danger: #ff4444;
+  --color-warning: #ffaa33;
 
   --font-heading: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
+}
+
+/* ─── Light theme ─────────────────────────────────────────
+   Dark is the default. `data-theme="light"` on <html> (set by
+   ThemeContext and the inline script in index.html) swaps the tokens;
+   every Tailwind utility reads these variables, so components need no
+   per-theme classes. */
+
+:root {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-bg-primary: #fafaf7;
+  --color-bg-secondary: #f1f1ec;
+  --color-bg-tertiary: #e8e8e2;
+  --color-bg-card: #ffffff;
+  --color-bg-card-hover: #f6f6f1;
+
+  --color-text-primary: #121212;
+  --color-text-secondary: #4b4b4b;
+  --color-text-muted: #767676;
+  --color-text-accent: #4f6d00;
+
+  --color-accent: #c8ff00;
+  --color-accent-ink: #4f6d00;
+  --color-accent-hover: #b4e600;
+  --color-on-accent: #0a0a0a;
+  --color-accent-dim: #3d5500;
+  --color-accent-glow: rgba(120, 160, 0, 0.18);
+  --color-accent-subtle: rgba(120, 160, 0, 0.1);
+
+  --color-border: #e0e0d9;
+  --color-border-subtle: #ebebe5;
+  --color-border-accent: rgba(79, 109, 0, 0.35);
+
+  --color-unavailable: #ecece6;
+  --color-unavailable-text: #a3a3a3;
+  --color-success: #00915a;
+  --color-danger: #d42a2a;
+  --color-warning: #b36200;
 }
 
 /* ─── Base ─────────────────────────────────────────────── */
@@ -51,15 +102,16 @@ body {
   color: var(--color-text-primary);
   overflow-x: hidden;
   line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 ::selection {
   background-color: var(--color-accent);
-  color: var(--color-bg-primary);
+  color: var(--color-on-accent);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-accent-ink);
   outline-offset: 2px;
 }
 
@@ -142,6 +194,21 @@ h1, h2, h3, h4, h5, h6 {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* Entrance animations are skipped with reduced motion, so elements
+     that start hidden (inline opacity: 0) must be shown directly. */
+  .scroll-reveal,
+  .court-reveal,
+  .hero-line,
+  .hero-visual,
+  .explorer-reveal,
+  .explorer-grid-reveal,
+  .date-item,
+  .time-slot,
+  [role="navigation"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* ─── Page transition wrapper ─────────────────────────── */
@@ -159,7 +226,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ─── Court SVG styles ────────────────────────────────── */
 
 .court-line {
-  stroke: var(--color-accent);
+  stroke: var(--color-accent-ink);
   stroke-width: 1.5;
   fill: none;
   opacity: 0.4;
@@ -177,7 +244,9 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 40px;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 14px 36px;
   font-family: var(--font-heading);
   font-weight: 600;
   font-size: 0.875rem;
@@ -186,17 +255,21 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   will-change: transform;
+}
+
+.magnetic-btn:active {
+  transform: scale(0.98);
 }
 
 .magnetic-btn-primary {
   background-color: var(--color-accent);
-  color: var(--color-bg-primary);
+  color: var(--color-on-accent);
 }
 
 .magnetic-btn-primary:hover {
-  background-color: var(--color-accent-dim);
+  background-color: var(--color-accent-hover);
 }
 
 .magnetic-btn-secondary {
@@ -206,8 +279,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .magnetic-btn-secondary:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  border-color: var(--color-accent-ink);
+  color: var(--color-accent-ink);
 }
 
 /* ─── Section label ───────────────────────────────────── */
@@ -218,7 +291,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-accent-ink);
   margin-bottom: 1rem;
 }
 
@@ -240,5 +313,33 @@ h1, h2, h3, h4, h5, h6 {
 @media (min-width: 1024px) {
   .container {
     padding: 0 64px;
+  }
+}
+
+/* Dark-themed embedded map (Google Maps embeds can't be styled directly).
+   Reverts to the normal map on hover so details stay readable. */
+.map-dark {
+  transition: filter 0.5s ease;
+}
+
+:root:not([data-theme="light"]) .map-dark {
+  filter: grayscale(0.4) invert(0.92) hue-rotate(180deg) contrast(0.9);
+}
+
+:root:not([data-theme="light"]) .group:hover .map-dark,
+:root:not([data-theme="light"]) .map-dark:focus {
+  filter: none;
+}
+
+/* Section rhythm: one vertical spacing scale for every content section. */
+.section-y {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+@media (min-width: 768px) {
+  .section-y {
+    padding-top: 5.5rem;
+    padding-bottom: 5.5rem;
   }
 }

@@ -1,4 +1,7 @@
 import { Link } from 'react-router-dom';
+import SocialLinks from './SocialLinks';
+import Logo from './Logo';
+import { socialLinks } from '../data/siteContent';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -11,8 +14,8 @@ export default function Footer() {
 
   const contactInfo = [
     { label: 'hello@theballroom.in' },
-    { label: '+91 98765 43210' },
-    { label: 'Mumbai, India' },
+    { label: '+91 99163 78416' },
+    { label: 'Ballari, Karnataka' },
   ];
 
   return (
@@ -23,22 +26,20 @@ export default function Footer() {
       <div className="container">
 
         {/* Main Footer */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10 md:gap-8">
 
           {/* Brand */}
-          <div className="md:col-span-1">
+          <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-block">
-              <img
-                src="/logo-on-dark.png"
-                alt="The Ball Room"
-                className="h-16 w-auto"
-              />
+              <Logo className="h-16 w-auto" />
             </Link>
 
             <p className="mt-4 text-sm text-text-secondary leading-relaxed max-w-xs">
-              Premium courts with seamless online booking. Pickleball & Chill —
+              Premium courts with seamless online booking. Pickleball & Chill -
               built for players who take the game seriously.
             </p>
+
+            <SocialLinks className="mt-6" />
           </div>
 
           {/* Navigation */}
@@ -52,7 +53,7 @@ export default function Footer() {
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="text-sm text-text-secondary hover:text-accent transition-colors duration-300"
+                    className="text-sm text-text-secondary hover:text-accent-ink transition-colors duration-300"
                   >
                     {link.label}
                   </Link>
@@ -87,11 +88,11 @@ export default function Footer() {
 
             <ul className="space-y-3">
               <li className="text-sm text-text-secondary">
-                Mon — Fri: 6AM — 10PM
+                Mon - Fri: 6AM - 10PM
               </li>
 
               <li className="text-sm text-text-secondary">
-                Sat — Sun: 7AM — 9PM
+                Sat - Sun: 7AM - 9PM
               </li>
 
               <li className="text-sm text-text-secondary">
@@ -111,14 +112,16 @@ export default function Footer() {
 
           {/* Social Links */}
           <div className="flex items-center gap-6">
-            {['Twitter', 'Instagram', 'LinkedIn'].map((social) => (
+            {socialLinks.map((social) => (
               <a
-                key={social}
-                href="#"
-                className="text-xs text-text-muted hover:text-accent transition-colors duration-300 uppercase tracking-widest"
-                aria-label={`Follow us on ${social}`}
+                key={social.id}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-text-muted hover:text-accent-ink transition-colors duration-300 uppercase tracking-widest"
+                aria-label={social.ariaLabel}
               >
-                {social}
+                {social.label}
               </a>
             ))}
           </div>
