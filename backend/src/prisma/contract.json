@@ -443,6 +443,13 @@
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
+              },
+              "tokenVersion": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -481,6 +488,9 @@
                 },
                 "role": {
                   "column": "role"
+                },
+                "tokenVersion": {
+                  "column": "tokenVersion"
                 }
               },
               "namespaceId": "public",
@@ -839,6 +849,15 @@
                   },
                   "nativeType": "text",
                   "nullable": false
+                },
+                "tokenVersion": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
                 }
               },
               "foreignKeys": [],
@@ -862,7 +881,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7bf353ef2483feaab758eeae1e6069b0fa34bd1aa1ac97359ca170f1476f167b"
+    "storageHash": "4d73a84f63e4fe0affee349eedec184d43e92b9ea33aab5aa0ebbc97c542f271"
   },
   "capabilities": {
     "postgres": {
