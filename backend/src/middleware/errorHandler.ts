@@ -39,7 +39,7 @@ export function errorHandler(
 
     logger.error("unhandled error", {
         method: req.method,
-        path: req.originalUrl,
+        path: req.originalUrl.split("?")[0],
         error
     });
 

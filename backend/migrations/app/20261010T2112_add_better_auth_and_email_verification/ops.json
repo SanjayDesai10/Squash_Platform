@@ -1,0 +1,606 @@
+[
+  {
+    "id": "table.auth_account",
+    "label": "Create table \"auth_account\"",
+    "summary": "Creates table \"auth_account\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "auth_account"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"auth_account\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_account\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"auth_account\"",
+        "sql": "CREATE TABLE \"public\".\"auth_account\" (\n  \"accessToken\" text,\n  \"accessTokenExpiresAt\" timestamptz,\n  \"accountId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"idToken\" text,\n  \"password\" text,\n  \"providerId\" text NOT NULL,\n  \"refreshToken\" text,\n  \"refreshTokenExpiresAt\" timestamptz,\n  \"scope\" text,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"auth_account\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_account\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.auth_session",
+    "label": "Create table \"auth_session\"",
+    "summary": "Creates table \"auth_session\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "auth_session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"auth_session\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_session\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"auth_session\"",
+        "sql": "CREATE TABLE \"public\".\"auth_session\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"expiresAt\" timestamptz NOT NULL,\n  \"id\" text NOT NULL,\n  \"ipAddress\" text,\n  \"token\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"userAgent\" text,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"auth_session\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_session\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.auth_user",
+    "label": "Create table \"auth_user\"",
+    "summary": "Creates table \"auth_user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "auth_user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"auth_user\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"auth_user\"",
+        "sql": "CREATE TABLE \"public\".\"auth_user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"emailVerified\" bool DEFAULT false NOT NULL,\n  \"id\" text NOT NULL,\n  \"image\" text,\n  \"name\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"auth_user\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.auth_verification",
+    "label": "Create table \"auth_verification\"",
+    "summary": "Creates table \"auth_verification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "auth_verification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"auth_verification\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_verification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"auth_verification\"",
+        "sql": "CREATE TABLE \"public\".\"auth_verification\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"expiresAt\" timestamptz NOT NULL,\n  \"id\" text NOT NULL,\n  \"identifier\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"value\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"auth_verification\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_verification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.user.emailVerified",
+    "label": "Add column \"emailVerified\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "emailVerified",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"emailVerified\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "emailVerified"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"emailVerified\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"emailVerified\" bool DEFAULT false NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"emailVerified\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "emailVerified"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.user.image",
+    "label": "Add column \"image\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "image",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"image\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "image"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"image\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"image\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"image\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "image"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "data_migration.backfill-existing-users-verified",
+    "label": "Data transform: backfill-existing-users-verified",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check backfill-existing-users-verified has work to do",
+        "sql": "SELECT EXISTS (SELECT \"id\" AS \"id\" FROM \"public\".\"user\" WHERE \"emailVerified\" = $1 LIMIT 1) AS ok",
+        "params": [
+          false
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run backfill-existing-users-verified",
+        "sql": "UPDATE \"public\".\"user\" SET \"emailVerified\" = $1 WHERE \"emailVerified\" = $2",
+        "params": [
+          true,
+          false
+        ]
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify backfill-existing-users-verified resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT \"id\" AS \"id\" FROM \"public\".\"user\" WHERE \"emailVerified\" = $1 LIMIT 1) AS ok",
+        "params": [
+          false
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.dropNotNull.user.passwordHash",
+    "label": "Drop NOT NULL on \"user\".\"passwordHash\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "passwordHash",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"passwordHash\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "passwordHash"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop NOT NULL on \"passwordHash\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ALTER COLUMN \"passwordHash\" DROP NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"passwordHash\" is nullable",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "passwordHash",
+          "YES"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.auth_session.auth_session_token_key",
+    "label": "Add unique constraint on \"auth_session\" (token)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "auth_session_token_key",
+        "table": "auth_session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"auth_session_token_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "auth_session_token_key",
+          "public",
+          "\"public\".\"auth_session\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"auth_session_token_key\"",
+        "sql": "ALTER TABLE \"public\".\"auth_session\" ADD CONSTRAINT \"auth_session_token_key\" UNIQUE (\"token\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"auth_session_token_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "auth_session_token_key",
+          "public",
+          "\"public\".\"auth_session\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.auth_user.auth_user_email_key",
+    "label": "Add unique constraint on \"auth_user\" (email)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "auth_user_email_key",
+        "table": "auth_user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"auth_user_email_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "auth_user_email_key",
+          "public",
+          "\"public\".\"auth_user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"auth_user_email_key\"",
+        "sql": "ALTER TABLE \"public\".\"auth_user\" ADD CONSTRAINT \"auth_user_email_key\" UNIQUE (\"email\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"auth_user_email_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "auth_user_email_key",
+          "public",
+          "\"public\".\"auth_user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.auth_account.auth_account_userId_idx_a489d58a",
+    "label": "Create index \"auth_account_userId_idx_a489d58a\" on \"auth_account\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "auth_account_userId_idx_a489d58a",
+        "table": "auth_account"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"auth_account_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_account_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"auth_account_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"auth_account_userId_idx_a489d58a\" ON \"public\".\"auth_account\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"auth_account_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_account_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.auth_session.auth_session_userId_idx_a489d58a",
+    "label": "Create index \"auth_session_userId_idx_a489d58a\" on \"auth_session\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "auth_session_userId_idx_a489d58a",
+        "table": "auth_session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"auth_session_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_session_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"auth_session_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"auth_session_userId_idx_a489d58a\" ON \"public\".\"auth_session\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"auth_session_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_session_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.auth_verification.auth_verification_identifier_idx_79a0dbb3",
+    "label": "Create index \"auth_verification_identifier_idx_79a0dbb3\" on \"auth_verification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "auth_verification_identifier_idx_79a0dbb3",
+        "table": "auth_verification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"auth_verification_identifier_idx_79a0dbb3\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_verification_identifier_idx_79a0dbb3\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"auth_verification_identifier_idx_79a0dbb3\"",
+        "sql": "CREATE INDEX \"auth_verification_identifier_idx_79a0dbb3\" ON \"public\".\"auth_verification\" (\"identifier\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"auth_verification_identifier_idx_79a0dbb3\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_verification_identifier_idx_79a0dbb3\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.auth_account.auth_account_userId_fkey",
+    "label": "Add foreign key \"auth_account_userId_fkey\" on \"auth_account\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "auth_account_userId_fkey",
+        "table": "auth_account"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"auth_account_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "auth_account_userId_fkey",
+          "public",
+          "\"public\".\"auth_account\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"auth_account_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"auth_account\"\nADD CONSTRAINT \"auth_account_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"auth_user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"auth_account_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "auth_account_userId_fkey",
+          "public",
+          "\"public\".\"auth_account\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.auth_session.auth_session_userId_fkey",
+    "label": "Add foreign key \"auth_session_userId_fkey\" on \"auth_session\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "auth_session_userId_fkey",
+        "table": "auth_session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"auth_session_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "auth_session_userId_fkey",
+          "public",
+          "\"public\".\"auth_session\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"auth_session_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"auth_session\"\nADD CONSTRAINT \"auth_session_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"auth_user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"auth_session_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "auth_session_userId_fkey",
+          "public",
+          "\"public\".\"auth_session\""
+        ]
+      }
+    ]
+  }
+]

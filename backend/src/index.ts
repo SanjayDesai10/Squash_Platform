@@ -9,6 +9,8 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { requestLogger } from "./middleware/requestLogger.js";
 import { cors, securityHeaders } from "./middleware/security.js";
 import { logger } from "./lib/logger.js";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/betterAuth.js";
 
 const app = express();
 
@@ -18,6 +20,11 @@ app.set("trust proxy", config.trustProxy);
 app.use(requestLogger);
 app.use(securityHeaders);
 app.use(cors);
+
+// Better Auth (Google OAuth). Must be mounted before express.json():
+// it reads the raw request body itself.
+app.all(`${config.betterAuth.basePath}/*splat`, toNodeHandler(auth));
+
 app.use(express.json({ limit: "10kb" }));
 
 app.get("/", (req, res) => {

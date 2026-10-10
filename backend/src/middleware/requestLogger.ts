@@ -15,7 +15,8 @@ export function requestLogger(
         // Never log headers or bodies: they carry tokens and passwords.
         logger.info("request", {
             method: req.method,
-            path: req.originalUrl,
+            // no query string: OAuth callbacks carry one-time codes there
+            path: req.originalUrl.split("?")[0],
             status: res.statusCode,
             durationMs: Math.round(durationMs * 10) / 10,
             ip: req.ip

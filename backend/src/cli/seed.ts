@@ -149,7 +149,9 @@ async function main() {
 
         const created = await db.orm.public.User.create({
             ...user,
-            passwordHash: await bcrypt.hash(password, 10)
+            passwordHash: await bcrypt.hash(password, 10),
+            // demo accounts skip the email-code step
+            emailVerified: true
         });
         userIds[key] = created.id;
         console.log(`user    ${user.email}: created`);
