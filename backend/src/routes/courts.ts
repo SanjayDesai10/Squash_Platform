@@ -1,7 +1,11 @@
 import express from "express";
 import {db} from "../prisma/db.js"
 import { asyncHandler } from "../middleware/asyncHandler.js";
+import { authenticate, requireAdmin } from "../middleware/auth.js";
 const router = express.Router();
+
+// Court mutations are admin-only.
+const adminOnly = [authenticate, requireAdmin];
 
 
 router.get("/", asyncHandler(async (req, res) => {
@@ -13,7 +17,7 @@ router.get("/", asyncHandler(async (req, res) => {
 }));
 
 
-router.post("/", asyncHandler(async (req, res) => {
+router.post("/", ...adminOnly, asyncHandler(async (req, res) => {
   const {name , type , description , features , pricePerHour , available , image , color} = req.body
 if (typeof name !== "string" || name.trim().length === 0) {
     return res.status(400).json({
@@ -80,7 +84,7 @@ if (
     });
 }
 const court = await db.orm.public.Court.create({
-    name,
+    name: name.trim(),
     type,
     description,
     features,
@@ -126,7 +130,7 @@ if (!court) {
 }));
 
 //update
-router.patch("/:id", asyncHandler(async (req, res) => {
+router.patch("/:id", ...adminOnly, asyncHandler(async (req, res) => {
     const id = req.params.id;
 
     if (typeof id !== "string") {
@@ -150,9 +154,10 @@ router.patch("/:id", asyncHandler(async (req, res) => {
         features,
         pricePerHour,
         available,
+        isActive,
         image,
         color
-    } = req.body;
+    } = req.body ?? {};
 
     // Validate name
     if (
@@ -226,6 +231,16 @@ if (
         });
     }
 
+    // Validate isActive (lets admins reactivate a deactivated court)
+    if (
+        isActive !== undefined &&
+        typeof isActive !== "boolean"
+    ) {
+        return res.status(400).json({
+            message: "invalid isActive"
+        });
+    }
+
     // Validate image
     if (
         image !== undefined &&
@@ -264,12 +279,13 @@ if (
     // Build update object
     const updateData: any = {};
 
-    if (name !== undefined) updateData.name = name;
+    if (name !== undefined) updateData.name = name.trim();
     if (type !== undefined) updateData.type = type;
     if (description !== undefined) updateData.description = description;
     if (features !== undefined) updateData.features = features;
     if (pricePerHour !== undefined) updateData.pricePerHour = pricePerHour;
     if (available !== undefined) updateData.available = available;
+    if (isActive !== undefined) updateData.isActive = isActive;
     if (image !== undefined) updateData.image = image;
     if (color !== undefined) updateData.color = color;
 
@@ -291,7 +307,7 @@ if (
 }));
 
 //delete
-router.delete("/:id", asyncHandler(async (req, res) => {
+router.delete("/:id", ...adminOnly, asyncHandler(async (req, res) => {
     const id = req.params.id;
 
     if (typeof id !== "string") {
@@ -329,4 +345,4 @@ res.status(200).json({
     message: "court deactivated successfully"
 });
 }));
-export default router 
+export default router;
