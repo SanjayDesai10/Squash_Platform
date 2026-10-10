@@ -109,7 +109,7 @@ export default function BookingPreview() {
   return (
     <section
       ref={sectionRef}
-      className="relative -mt-16 z-20"
+      className="relative -mt-16 z-20 pb-16 md:pb-24"
       aria-label="Quick Booking"
     >
       <div className="container">

@@ -2,6 +2,7 @@ import { useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 import BookingPreview from '../components/BookingPreview';
+import PlayerBenefits from '../components/PlayerBenefits';
 import CourtCard from '../components/CourtCard';
 import LocationMap from '../components/LocationMap';
 import AnimatedCounter from '../components/AnimatedCounter';
@@ -57,6 +58,9 @@ export default function Home() {
 
       {/* Quick Booking */}
       <BookingPreview />
+
+      {/* Why pickleball: photos + player benefits */}
+      <PlayerBenefits />
 
       {/* Featured Courts */}
       {/* <section ref={courtsRef} className="section-y bg-bg-secondary" aria-label="Featured Courts">
