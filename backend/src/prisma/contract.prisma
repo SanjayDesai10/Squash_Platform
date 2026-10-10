@@ -1,0 +1,60 @@
+// use prisma-8
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("user")
+  tokenVersion Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  bookings     Booking[]
+}
+
+model Court {
+  id           Int        @id @default(autoincrement())
+  name         String
+  type         String?
+  description  String?
+  features     String[]
+  pricePerHour Int
+  available    Boolean    @default(true)
+  isActive     Boolean    @default(true)
+  image        String?
+  color        String
+
+  timeslots    Timeslot[]
+  bookings     Booking[]
+}
+
+model Timeslot {
+  id        Int      @id @default(autoincrement())
+  courtId   Int
+  date      String
+  startTime String
+  endTime   String
+  available Boolean  @default(true)
+  isActive  Boolean  @default(true)
+
+  court Court @relation(fields: [courtId], references: [id])
+
+  @@unique([courtId, date, startTime])
+}
+
+model Booking {
+  id        String   @id
+  courtId   Int
+  date      String
+  startTime String
+  endTime   String
+  price     Int
+  status    String   @default("confirmed")
+  createdAt DateTime @default(now())
+  userId    Int?
+
+  court Court  @relation(fields: [courtId], references: [id])
+  user  User?  @relation(fields: [userId], references: [id])
+
+  @@index([courtId, date, startTime], map: "booking_confirmed_slot_unique", where: "(status = 'confirmed'::text)", unique: true)
+}
