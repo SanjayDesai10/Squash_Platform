@@ -1,6 +1,6 @@
-# The Ball Room — Backend Plan
+# The Ball Room - Backend Plan
 
-A guide for building the backend for the squash/pickleball court booking platform.
+A guide for building the backend for the pickleball court booking platform.
 
 ---
 
@@ -13,7 +13,7 @@ A guide for building the backend for the squash/pickleball court booking platfor
 | `name` | String | e.g. "Court 01" |
 | `type` | String | e.g. "Professional", "Premium", "Standard", "Training" |
 | `description` | Text | Court description |
-| `features` | Array / JSON | e.g. `["Maple Flooring", "LED Lighting"]` |
+| `features` | Array / JSON | e.g. `["Cushioned Acrylic Surface", "LED Lighting"]` |
 | `pricePerHour` | Integer | Price in ₹ |
 | `available` | Boolean | Whether the court is open for booking |
 | `image` | String (nullable) | Image URL |
@@ -41,7 +41,7 @@ A guide for building the backend for the squash/pickleball court booking platfor
 | `createdAt` | Timestamp | When the booking was made |
 | `userId` | Integer (FK → Users, nullable) | Optional, for future auth |
 
-### Users *(Optional — for future auth)*
+### Users *(Optional - for future auth)*
 | Field | Type | Notes |
 |---|---|---|
 | `id` | Integer (PK) | Auto-increment |

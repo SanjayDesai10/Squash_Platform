@@ -1,6 +1,6 @@
-# Squash Platform
+# The Ball Room — Pickleball Platform
 
-Court booking platform for squash and pickleball.
+Court booking platform for pickleball.
 
 ## Project Structure
 
