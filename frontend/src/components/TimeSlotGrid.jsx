@@ -2,6 +2,12 @@ import { useRef, useEffect } from 'react';
 import { animate, utils } from 'animejs';
 import { prefersReducedMotion } from '../animations/heroAnimations';
 
+const STATUS_LABELS = {
+  booked: 'Booked',
+  blocked: 'Unavailable',
+  past: 'Passed',
+};
+
 export default function TimeSlotGrid({ slots, selectedSlot, onSelect }) {
   const gridRef = useRef(null);
 
@@ -49,14 +55,16 @@ export default function TimeSlotGrid({ slots, selectedSlot, onSelect }) {
                   !slot.available
                     ? 'bg-unavailable text-unavailable-text border-transparent cursor-not-allowed line-through'
                     : selectedSlot === slot.time
-                    ? 'bg-accent text-bg-primary border-accent'
-                    : 'bg-transparent text-text-secondary border-border hover:border-accent hover:text-accent'
+                    ? 'bg-accent text-on-accent border-accent-ink'
+                    : 'bg-transparent text-text-secondary border-border hover:border-accent-ink hover:text-accent-ink'
                 }`}
                 onClick={(e) => slot.available && handleSelect(slot.time, e)}
                 disabled={!slot.available}
-                aria-label={`${slot.label}${!slot.available ? ' — Unavailable' : ''}`}
+                aria-label={`${slot.label}${!slot.available ? ` - ${STATUS_LABELS[slot.status] ?? 'Unavailable'}` : ''}`}
                 aria-pressed={selectedSlot === slot.time}
-                style={{ opacity: 0 }}
+                title={!slot.available ? STATUS_LABELS[slot.status] : undefined}
+                // Start hidden only when the entrance animation will run.
+                style={prefersReducedMotion() ? undefined : { opacity: 0 }}
               >
                 {slot.label}
               </button>

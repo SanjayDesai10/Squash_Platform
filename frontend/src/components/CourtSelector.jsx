@@ -24,7 +24,7 @@ export default function CourtSelector({ courts, selectedCourt, onSelect }) {
             !court.available
               ? 'bg-unavailable border-transparent cursor-not-allowed opacity-50'
               : selectedCourt === court.id
-              ? 'bg-accent/10 border-accent'
+              ? 'bg-accent/10 border-accent-ink'
               : 'bg-bg-card border-border hover:border-text-muted'
           }`}
           aria-pressed={selectedCourt === court.id}

@@ -1,0 +1,106 @@
+import { useEffect, useRef, useState } from 'react';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import FormField from '../components/FormField';
+import { InlineAlert } from '../components/StatusMessage';
+import { useAuth } from '../context/AuthContext';
+import { getSafeNext } from '../lib/redirect';
+import { animatePageEnter } from '../animations/heroAnimations';
+
+export default function Register() {
+  const pageRef = useRef(null);
+  const { user, register } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const next = getSafeNext(searchParams, '/book');
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!pageRef.current) return;
+    const anim = animatePageEnter(pageRef.current);
+    return () => { if (anim) anim.pause(); };
+  }, []);
+
+  if (user && !submitting) return <Navigate to={next} replace />;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await register(name, email, password);
+      navigate(next, { replace: true });
+    } catch (err) {
+      setError(err.message);
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div ref={pageRef}>
+      <section className="pt-36 pb-24 md:pt-44 md:pb-32" aria-label="Create account">
+        <div className="container max-w-md">
+          <span className="section-label">Account</span>
+          <h1 className="font-heading text-4xl sm:text-5xl font-bold mt-4">
+            JOIN <span className="text-accent-ink">TBR</span>
+          </h1>
+          <p className="mt-4 text-text-secondary">Create an account to start booking courts.</p>
+
+          <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+            {error && <InlineAlert>{error}</InlineAlert>}
+            <FormField id="name" label="Name" value={name} onChange={setName} autoComplete="name" />
+            <FormField id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
+            <FormField
+              id="password"
+              label="Password"
+              type="password"
+              value={password}
+              onChange={setPassword}
+              autoComplete="new-password"
+              minLength={8}
+              hint="At least 8 characters."
+            />
+            <FormField
+              id="confirmPassword"
+              label="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              autoComplete="new-password"
+              minLength={8}
+            />
+            <button
+              type="submit"
+              disabled={submitting}
+              className="magnetic-btn magnetic-btn-primary w-full justify-center disabled:opacity-50"
+            >
+              {submitting ? 'Creating account…' : 'Create Account'}
+            </button>
+          </form>
+
+          <p className="mt-8 text-sm text-text-secondary">
+            Already have an account?{' '}
+            <Link to={`/login?next=${encodeURIComponent(next)}`} className="text-accent-ink hover:text-accent-dim transition-colors">
+              Log in
+            </Link>
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}
