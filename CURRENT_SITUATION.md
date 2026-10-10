@@ -287,6 +287,36 @@ Booking IDs have the form `SQ-<year>-<8 chars>`: the year is the current year in
 
 Use `GET /api/bookings` to retrieve all bookings owned by the logged-in user.
 
+## Sign-in: Google OAuth and email verification (Better Auth)
+
+[Better Auth](https://better-auth.com) is used for two things; our own JWT login, roles, admin and password change are unchanged.
+
+**Google sign-in**
+1. "Continue with Google" (login/register pages) calls Better Auth's `POST /api/better-auth/sign-in/social` and redirects to Google.
+2. Google returns to `GET /api/better-auth/callback/google`; Better Auth creates a short-lived session (cookie `tbr-auth.session_token`) and redirects to `/auth/google/callback`.
+3. That page calls `POST /api/auth/google/complete`: the backend checks the session belongs to a Google account with a verified email, **links to the existing account with the same email** (or creates one with no password), issues our normal JWT, and immediately deletes the Better Auth session.
+
+**Email verification for email/password sign-ups**
+- `POST /api/auth/register` creates the account unverified and emails a 6-digit code (Better Auth `emailOTP` plugin, sent with Resend; logged to the console when `RESEND_API_KEY` is not set in development).
+- `POST /api/auth/verify-email { email, otp }` confirms it and logs the user in. Codes expire after 10 minutes, allow 5 attempts and are single-use.
+- `POST /api/auth/resend-verification { email }` (60 s cooldown per email). Logging in to an unverified account returns `403 { code: "EMAIL_NOT_VERIFIED" }` and sends a fresh code.
+- Accounts that existed before this feature, Google accounts and seeded demo accounts are verified.
+
+**Other endpoints:** `GET /api/auth/providers` → `{ google: boolean }` (button only shows when configured). User objects now include `image` (Google photo) and `hasPassword` (false for Google-only accounts, which cannot use password login or change-password).
+
+**Data:** Better Auth's tables are `auth_user`, `auth_session`, `auth_account`, `auth_verification` (Prisma contract + migration `add_better_auth_and_email_verification`). It connects to Postgres through `pg` directly. Its unused public endpoints (email/password, email-OTP sign-in, account updates) are disabled via `disabledPaths`; server-side calls still work.
+
+**Google Cloud Console (OAuth client, type "Web application")**
+
+| Setting | Development |
+|---|---|
+| Authorized JavaScript origins | `http://localhost:5173` |
+| Authorized redirect URIs | `http://localhost:5173/api/better-auth/callback/google` |
+
+For production add `https://<your-domain>` and `https://<your-domain>/api/better-auth/callback/google`, and set `FRONTEND_URL` accordingly. The site must be opened at exactly that origin (e.g. `localhost`, not `127.0.0.1`).
+
+**npm note:** `backend/.npmrc` sets `legacy-peer-deps=true` because better-auth lists Prisma ≤ 7 as an optional peer (for an adapter we don't use).
+
 ## Booking Flow (payment by phone)
 
 Online payment is not live yet. Booking works as a request that an admin confirms after payment:
