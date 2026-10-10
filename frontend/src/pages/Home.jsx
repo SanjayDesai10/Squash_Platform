@@ -3,15 +3,20 @@ import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 import BookingPreview from '../components/BookingPreview';
 import CourtCard from '../components/CourtCard';
+import LocationMap from '../components/LocationMap';
 import AnimatedCounter from '../components/AnimatedCounter';
 import MagneticButton from '../components/MagneticButton';
-import { courts, benefits, stats } from '../data/mockData';
+import { ErrorState, LoadingState } from '../components/StatusMessage';
+import { benefits, stats } from '../data/siteContent';
+import { useCourts } from '../hooks/useCourts';
 import { animatePageEnter, animateOnScroll, prefersReducedMotion } from '../animations/heroAnimations';
 import { useScrollAnimation } from '../animations/cursorAnimations';
 
 export default function Home() {
   const pageRef = useRef(null);
   const courtsRef = useRef(null);
+  const courtsGridRef = useRef(null);
+  const { courts, loading: courtsLoading, error: courtsError, reload: reloadCourts } = useCourts();
   const benefitsRef = useRef(null);
   const statsRef = useRef(null);
   const ctaRef = useRef(null);
@@ -26,6 +31,14 @@ export default function Home() {
   useScrollAnimation(courtsRef, useCallback((el) => {
     animateOnScroll(el.querySelectorAll('.scroll-reveal'), { stagger: 120 });
   }, []));
+
+  // Court cards load asynchronously, so they animate separately once
+  // the grid is rendered (the callback changes when courts arrive).
+  useScrollAnimation(courtsGridRef, useCallback((el) => {
+    animateOnScroll(el.querySelectorAll('.court-reveal'), { stagger: 120 });
+    // courts.length is intentional: it re-arms the observer once the grid exists.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [courts.length]));
 
   // Benefits section scroll animation
   useScrollAnimation(benefitsRef, useCallback((el) => {
@@ -46,7 +59,7 @@ export default function Home() {
       <BookingPreview />
 
       {/* Featured Courts */}
-      <section ref={courtsRef} className="py-20 md:py-32 bg-bg-secondary" aria-label="Featured Courts">
+      {/* <section ref={courtsRef} className="section-y bg-bg-secondary" aria-label="Featured Courts">
         <div className="container">
           <div className="scroll-reveal" style={{ opacity: 0 }}>
             <span className="section-label">Courts</span>
@@ -56,25 +69,35 @@ export default function Home() {
               </h2>
               <Link
                 to="/courts"
-                className="text-sm font-heading tracking-widest uppercase text-text-secondary hover:text-accent transition-colors"
+                className="text-sm font-heading tracking-widest uppercase text-text-secondary hover:text-accent-ink transition-colors"
               >
                 View All →
               </Link>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
-            {courts.slice(0, 4).map((court, i) => (
-              <div key={court.id} className="scroll-reveal" style={{ opacity: 0 }}>
-                <CourtCard court={court} index={i} />
-              </div>
-            ))}
-          </div>
+          {courtsLoading ? (
+            <LoadingState label="Loading courts…" className="mt-12" />
+          ) : courtsError ? (
+            <ErrorState message={courtsError} onRetry={reloadCourts} className="mt-12" />
+          ) : (
+            <div ref={courtsGridRef} className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+              {courts.slice(0, 4).map((court, i) => (
+                <div
+                  key={court.id}
+                  className="court-reveal"
+                  style={prefersReducedMotion() ? undefined : { opacity: 0 }}
+                >
+                  <CourtCard court={court} index={i} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </section>
+      </section> */}
 
       {/* Why Choose Us */}
-      <section ref={benefitsRef} className="py-20 md:py-32" aria-label="Benefits">
+      <section ref={benefitsRef} className="section-y" aria-label="Benefits">
         <div className="container">
           <div className="scroll-reveal text-center mb-16" style={{ opacity: 0 }}>
             <span className="section-label">Why TBR</span>
@@ -87,10 +110,10 @@ export default function Home() {
             {benefits.map((benefit, i) => (
               <div
                 key={benefit.title}
-                className="scroll-reveal group text-center p-8 border border-border transition-all duration-500 hover:border-border-accent"
+                className="scroll-reveal group text-center p-8 border border-border transition-all duration-500 hover:border-border-accent-ink"
                 style={{ opacity: 0 }}
               >
-                <div className="text-3xl mb-4 text-accent opacity-60 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="text-3xl mb-4 text-accent-ink opacity-60 group-hover:opacity-100 transition-opacity duration-500">
                   {benefit.icon}
                 </div>
                 <h3 className="font-heading text-lg font-bold tracking-wide mb-3">
@@ -106,7 +129,7 @@ export default function Home() {
       </section>
 
       {/* Statistics */}
-      <section ref={statsRef} className="py-20 md:py-32 bg-bg-secondary border-y border-border" aria-label="Statistics">
+      {/* <section ref={statsRef} className="section-y bg-bg-secondary border-y border-border" aria-label="Statistics">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             {stats.map((stat) => (
@@ -120,10 +143,13 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
+
+      {/* Location */}
+      <LocationMap />
 
       {/* CTA */}
-      <section ref={ctaRef} className="py-24 md:py-40" aria-label="Call to action">
+      <section ref={ctaRef} className="py-24 md:py-32" aria-label="Call to action">
         <div className="container text-center">
           <div className="scroll-reveal" style={{ opacity: 0 }}>
             <span className="section-label">Ready?</span>

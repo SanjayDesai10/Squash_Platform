@@ -34,7 +34,7 @@ export default function AnimatedCounter({ value, prefix = '', suffix = '', label
     <div ref={ref} className="text-center">
       <div
         ref={numberRef}
-        className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold text-accent"
+        className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold text-accent-ink"
       >
         {`${prefix}0${suffix}`}
       </div>

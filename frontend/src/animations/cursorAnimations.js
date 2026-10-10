@@ -134,9 +134,9 @@ export function useScrollAnimation(ref, callback, options = {}) {
 }
 
 /**
- * Squash ball cursor follower animation
+ * Pickleball cursor follower animation (hero)
  */
-export function useSquashBallCursor(ballRef, containerRef) {
+export function usePickleballCursor(ballRef, containerRef) {
   const animFrameRef = useRef(null);
 
   useEffect(() => {

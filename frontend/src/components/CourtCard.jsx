@@ -2,6 +2,9 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { animate } from 'animejs';
 import { prefersReducedMotion } from '../animations/heroAnimations';
+import { PickleballShape } from './Pickleball';
+import PickleballCourt from './PickleballCourt';
+import { getCourtNumber } from '../lib/courts';
 
 export default function CourtCard({ court, index = 0 }) {
   const cardRef = useRef(null);
@@ -40,7 +43,7 @@ export default function CourtCard({ court, index = 0 }) {
   return (
     <div
       ref={cardRef}
-      className="group relative bg-bg-card border border-border p-6 md:p-8 transition-colors duration-500 hover:bg-bg-card-hover hover:border-border-accent"
+      className="group relative bg-bg-card border border-border p-6 md:p-8 transition-colors duration-500 hover:bg-bg-card-hover hover:border-border-accent-ink"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ willChange: 'transform' }}
@@ -50,21 +53,18 @@ export default function CourtCard({ court, index = 0 }) {
         className="relative h-48 md:h-56 mb-6 overflow-hidden flex items-center justify-center"
         style={{ background: `linear-gradient(135deg, ${court.color}08, ${court.color}15)` }}
       >
-        {/* Stylized court diagram */}
-        <svg viewBox="0 0 200 260" className="w-24 h-32 opacity-30 group-hover:opacity-60 transition-opacity duration-500">
-          <rect x="10" y="10" width="180" height="240" fill="none" stroke={court.color} strokeWidth="1.5" />
-          <line x1="10" y1="130" x2="190" y2="130" stroke={court.color} strokeWidth="1" />
-          <rect x="50" y="70" width="100" height="120" fill="none" stroke={court.color} strokeWidth="1" opacity="0.5" />
-          <line x1="100" y1="70" x2="100" y2="190" stroke={court.color} strokeWidth="0.5" opacity="0.3" />
-          <circle cx="100" cy="130" r="4" fill={court.color} opacity="0.6" />
+        {/* Stylized pickleball court diagram */}
+        <svg viewBox="0 0 200 260" className="w-24 h-32 opacity-40 group-hover:opacity-70 transition-opacity duration-500">
+          <PickleballCourt x={45.45} y={10} height={240} color={court.color} weight={0.8} />
+          <PickleballShape cx={125} cy={205} r={9} holes={26} />
         </svg>
 
         {/* Court number watermark */}
         <div
-          className="absolute bottom-2 right-4 font-heading text-7xl font-bold opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-500"
+          className="absolute bottom-2 right-4 font-heading text-7xl font-bold opacity-40 group-hover:opacity-70 transition-opacity duration-500"
           style={{ color: court.color }}
         >
-          {court.id.toString().padStart(2, '0')}
+          {getCourtNumber(court, index)}
         </div>
       </div>
 
@@ -94,12 +94,16 @@ export default function CourtCard({ court, index = 0 }) {
           ₹{court.pricePerHour}
           <span className="text-sm text-text-muted font-normal">/hr</span>
         </span>
-        <Link
-          to="/book"
-          className="text-sm font-heading tracking-wider uppercase text-accent hover:text-accent-dim transition-colors duration-300"
-        >
-          Book →
-        </Link>
+        {court.available ? (
+          <Link
+            to={`/book?court=${court.id}`}
+            className="text-sm font-heading tracking-wider uppercase text-accent-ink hover:text-accent-dim transition-colors duration-300"
+          >
+            Book →
+          </Link>
+        ) : (
+          <span className="text-sm font-heading tracking-wider uppercase text-text-muted">Unavailable</span>
+        )}
       </div>
     </div>
   );

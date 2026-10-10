@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { animateHero } from '../animations/heroAnimations';
-import { useCursorParallax, useSquashBallCursor } from '../animations/cursorAnimations';
+import { useCursorParallax, usePickleballCursor } from '../animations/cursorAnimations';
+import Pickleball from './Pickleball';
 import MagneticButton from './MagneticButton';
 
 export default function Hero() {
@@ -8,7 +9,7 @@ export default function Hero() {
   const ballRef = useRef(null);
 
   useCursorParallax(containerRef);
-  useSquashBallCursor(ballRef, containerRef);
+  usePickleballCursor(ballRef, containerRef);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -30,13 +31,13 @@ export default function Hero() {
           className="w-full h-full"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(200,255,0,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(200,255,0,0.3) 1px, transparent 1px)',
+              'linear-gradient(var(--color-border-accent) 1px, transparent 1px), linear-gradient(90deg, var(--color-border-accent) 1px, transparent 1px)',
             backgroundSize: '80px 80px',
           }}
         />
       </div>
 
-      {/* Abstract court lines — decorative SVG */}
+      {/* Abstract court lines - decorative SVG */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none"
         viewBox="0 0 1440 900"
@@ -97,7 +98,7 @@ export default function Hero() {
         />
       </svg>
 
-      {/* Squash Ball — interactive cursor element */}
+      {/* Pickleball - interactive cursor element */}
       <div
         ref={ballRef}
         className="hero-visual absolute right-[10%] top-1/2 -translate-y-1/2 hidden lg:block"
@@ -109,7 +110,7 @@ export default function Hero() {
           <div
             className="absolute inset-0 rounded-full blur-3xl"
             style={{
-              background: 'radial-gradient(circle, rgba(200,255,0,0.15) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, var(--color-accent-glow) 0%, transparent 70%)',
               width: '400px',
               height: '400px',
               transform: 'translate(-50%, -50%)',
@@ -117,22 +118,12 @@ export default function Hero() {
               left: '50%',
             }}
           />
-          {/* Ball */}
-          <div
-            className="relative w-48 h-48 rounded-full"
-            style={{
-              background: 'radial-gradient(circle at 35% 35%, #e8ff44, #c8ff00 40%, #8ab300 80%, #5a7700)',
-              boxShadow: '0 0 60px rgba(200,255,0,0.2), inset -20px -20px 40px rgba(0,0,0,0.3), inset 10px 10px 20px rgba(255,255,255,0.1)',
-            }}
-          >
-            {/* Dot pattern (squash ball texture) */}
-            <div className="absolute inset-4 rounded-full opacity-20"
-              style={{
-                backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.4) 1px, transparent 1px)',
-                backgroundSize: '8px 8px',
-              }}
-            />
-          </div>
+          {/* Pickleball */}
+          <Pickleball
+            size={192}
+            className="relative"
+            style={{ filter: 'drop-shadow(0 0 40px rgba(200,255,0,0.25)) drop-shadow(0 20px 30px rgba(0,0,0,0.45))' }}
+          />
         </div>
       </div>
 
@@ -140,14 +131,14 @@ export default function Hero() {
       <div className="container relative z-10 pt-20">
         <div className="max-w-3xl">
           {/* Label */}
-          <div className="hero-line section-label">The Ball Room — Pickleball & Chill</div>
+          <div className="hero-line section-label">The Ball Room - Pickleball & Chill</div>
 
           {/* Headline */}
           <h1 className="mt-6">
             <span className="hero-line block text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight" style={{ opacity: 0 }}>
               PLAY.
             </span>
-            <span className="hero-line block text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-accent mt-2" style={{ opacity: 0 }}>
+            <span className="hero-line block text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-accent-ink mt-2" style={{ opacity: 0 }}>
               COMPETE.
             </span>
             <span className="hero-line block text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mt-2" style={{ opacity: 0 }}>

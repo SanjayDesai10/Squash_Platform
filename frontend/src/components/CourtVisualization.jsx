@@ -1,9 +1,26 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { animate, utils } from 'animejs';
+import { PickleballShape } from './Pickleball';
+import PickleballCourt from './PickleballCourt';
+import { getCourtGeometry } from '../lib/courtGeometry';
 import { prefersReducedMotion } from '../animations/heroAnimations';
 import { useScrollAnimation } from '../animations/cursorAnimations';
 
 const { stagger } = utils;
+
+// Court fills the 500×600 viewBox: 500 tall (y 50–550), centred horizontally.
+const COURT = getCourtGeometry(250 - (500 * 20 / 44) / 2, 50, 500);
+
+// Ball rally across the net, as offsets from its resting point
+// (serve position, bottom-left service court).
+const BALL_HOME = { x: 205, y: 480 };
+const RALLY = [
+  { x: 205, y: 480 }, // serve
+  { x: 300, y: 130 }, // deep cross-court
+  { x: 220, y: 235 }, // dink into the kitchen
+  { x: 285, y: 370 }, // return
+  { x: 205, y: 480 },
+];
 
 export default function CourtVisualization() {
   const svgRef = useRef(null);
@@ -36,10 +53,10 @@ export default function CourtVisualization() {
       easing: 'outBack',
     });
 
-    // Ball movement loop
+    // Ball rally loop
     animate(ballRef.current, {
-      cx: [250, 350, 250, 150, 250],
-      cy: [300, 200, 100, 200, 300],
+      translateX: RALLY.map((p) => p.x - BALL_HOME.x),
+      translateY: RALLY.map((p) => p.y - BALL_HOME.y),
       duration: 8000,
       easing: 'inOutSine',
       loop: true,
@@ -75,13 +92,13 @@ export default function CourtVisualization() {
   }, []);
 
   return (
-    <section ref={containerRef} className="py-20 md:py-32 bg-bg-secondary" aria-label="Court Visualization">
+    <section ref={containerRef} className="section-y bg-bg-secondary" aria-label="Court Visualization">
       <div className="container">
         <div className="text-center mb-12">
           <span className="section-label">Interactive</span>
           <h2 className="font-heading text-3xl md:text-4xl font-bold mt-2">COURT LAYOUT</h2>
           <p className="text-text-secondary mt-4 max-w-lg mx-auto">
-            A stylized representation of our professional courts. Move your cursor to interact.
+            A regulation 20 × 44 ft pickleball court. Move your cursor to interact.
           </p>
         </div>
 
@@ -90,7 +107,7 @@ export default function CourtVisualization() {
             <svg
               ref={svgRef}
               viewBox="0 0 500 600"
-              className="w-full h-full"
+              className="w-full h-full text-accent-ink"
               aria-label="Court layout diagram"
             >
               {/* Floor gradient */}
@@ -100,89 +117,43 @@ export default function CourtVisualization() {
                   <stop offset="100%" stopColor="#c8ff00" stopOpacity="0.01" />
                 </linearGradient>
               </defs>
-              <rect x="50" y="50" width="400" height="500" fill="url(#floorGrad)" />
+              <rect x={COURT.x} y={COURT.y} width={COURT.width} height={COURT.height} fill="url(#floorGrad)" />
 
-              {/* Outer walls */}
-              <rect
-                className="viz-line"
-                x="50" y="50" width="400" height="500"
-                fill="none" stroke="#c8ff00" strokeWidth="2"
-                style={{ opacity: 0, transition: 'transform 0.3s ease' }}
-              />
-
-              {/* Front wall (bottom) */}
-              <line
-                className="viz-line"
-                x1="50" y1="550" x2="450" y2="550"
-                stroke="#c8ff00" strokeWidth="3"
-                style={{ opacity: 0, transition: 'transform 0.3s ease' }}
-              />
-
-              {/* Service line */}
-              <line
-                className="viz-line"
-                x1="50" y1="280" x2="450" y2="280"
-                stroke="#c8ff00" strokeWidth="1.5"
-                style={{ opacity: 0, transition: 'transform 0.3s ease' }}
-              />
-
-              {/* Short line */}
-              <line
-                className="viz-line"
-                x1="50" y1="380" x2="450" y2="380"
-                stroke="#c8ff00" strokeWidth="1"
-                style={{ opacity: 0, transition: 'transform 0.3s ease' }}
-              />
-
-              {/* Half-court line */}
-              <line
-                className="viz-line"
-                x1="250" y1="280" x2="250" y2="550"
-                stroke="#c8ff00" strokeWidth="1"
-                style={{ opacity: 0, transition: 'transform 0.3s ease' }}
-              />
-
-              {/* Left service box */}
-              <rect
-                className="viz-line"
-                x="50" y="280" width="200" height="100"
-                fill="none" stroke="#c8ff00" strokeWidth="0.8"
-                style={{ opacity: 0, transition: 'transform 0.3s ease' }}
-              />
-
-              {/* Right service box */}
-              <rect
-                className="viz-line"
-                x="250" y="280" width="200" height="100"
-                fill="none" stroke="#c8ff00" strokeWidth="0.8"
-                style={{ opacity: 0, transition: 'transform 0.3s ease' }}
-              />
-
-              {/* Tin line */}
-              <line
-                className="viz-line"
-                x1="50" y1="530" x2="450" y2="530"
-                stroke="#c8ff00" strokeWidth="1" opacity="0.5"
-                style={{ opacity: 0, transition: 'transform 0.3s ease' }}
+              <PickleballCourt
+                x={COURT.x}
+                y={COURT.y}
+                height={COURT.height}
+                lineProps={{ className: 'viz-line', style: { opacity: 0, transition: 'transform 0.3s ease' } }}
               />
 
               {/* Ball */}
-              <circle
+              <PickleballShape
                 ref={ballRef}
-                cx="250" cy="300" r="10"
-                fill="#c8ff00"
-                style={{ opacity: 0 }}
+                cx={BALL_HOME.x}
+                cy={BALL_HOME.y}
+                r={13}
+                holes={26}
+                style={{ opacity: 0, transformBox: 'fill-box', transformOrigin: 'center' }}
               />
 
               {/* Labels */}
-              <text x="250" y="30" textAnchor="middle" fill="#666" fontSize="10" fontFamily="Space Grotesk">
-                BACK WALL
+              <text x="250" y="35" textAnchor="middle" fill="#666" fontSize="10" fontFamily="Space Grotesk">
+                BASELINE
               </text>
-              <text x="250" y="580" textAnchor="middle" fill="#666" fontSize="10" fontFamily="Space Grotesk">
-                FRONT WALL
+              <text x="250" y="575" textAnchor="middle" fill="#666" fontSize="10" fontFamily="Space Grotesk">
+                BASELINE
               </text>
-              <text x="30" y="300" textAnchor="middle" fill="#666" fontSize="10" fontFamily="Space Grotesk" transform="rotate(-90, 30, 300)">
-                SIDE WALL
+              <text x={COURT.right + 22} y={COURT.netY + 3} textAnchor="start" fill="#666" fontSize="10" fontFamily="Space Grotesk">
+                NET
+              </text>
+              <text x={COURT.right + 22} y={(COURT.netY + COURT.kitchenBottom) / 2 + 3} textAnchor="start" fill="#666" fontSize="10" fontFamily="Space Grotesk">
+                KITCHEN
+              </text>
+              <text x={COURT.right + 22} y={(COURT.kitchenBottom + COURT.bottom) / 2 + 3} textAnchor="start" fill="#666" fontSize="10" fontFamily="Space Grotesk">
+                SERVICE COURT
+              </text>
+              <text x={COURT.x - 32} y={(COURT.y + COURT.kitchenTop) / 2} textAnchor="middle" fill="#666" fontSize="10" fontFamily="Space Grotesk" transform={`rotate(-90, ${COURT.x - 32}, ${(COURT.y + COURT.kitchenTop) / 2})`}>
+                SIDELINE
               </text>
             </svg>
           </div>
