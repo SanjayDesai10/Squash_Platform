@@ -45,7 +45,11 @@ export function onUnauthorized(listener) {
   return () => unauthorizedListeners.delete(listener);
 }
 
-async function request(method, path, { body, auth = false } = {}) {
+// `sameOrigin`: always call this site's own /api (proxied to the backend),
+// ignoring VITE_API_URL. Google sign-in needs this: Better Auth's cookies
+// must belong to the site's domain, because that's where Google sends the
+// user back (/api/better-auth/callback/google).
+async function request(method, path, { body, auth = false, sameOrigin = false } = {}) {
   const headers = {};
   if (body !== undefined) headers['Content-Type'] = 'application/json';
 
@@ -54,7 +58,7 @@ async function request(method, path, { body, auth = false } = {}) {
 
   let response;
   try {
-    response = await fetch(`${BASE_URL}${path}`, {
+    response = await fetch(`${sameOrigin ? '' : BASE_URL}${path}`, {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -96,9 +100,10 @@ export const api = {
   startGoogleSignIn: ({ callbackURL, errorCallbackURL }) =>
     request('POST', '/api/better-auth/sign-in/social', {
       body: { provider: 'google', callbackURL, errorCallbackURL },
+      sameOrigin: true,
     }),
   // Exchanges the Better Auth session cookie for our login token.
-  completeGoogleSignIn: () => request('POST', '/api/auth/google/complete'),
+  completeGoogleSignIn: () => request('POST', '/api/auth/google/complete', { sameOrigin: true }),
   changePassword: (currentPassword, newPassword) =>
     request('PATCH', '/api/auth/change-password', {
       body: { currentPassword, newPassword },
