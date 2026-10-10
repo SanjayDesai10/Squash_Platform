@@ -9,10 +9,13 @@ const BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 const TOKEN_KEY = 'tbr.token';
 
 export class ApiError extends Error {
-  constructor(status, message) {
+  constructor(status, message, data = null) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
+    // Full response body, e.g. { code: 'EMAIL_NOT_VERIFIED', email }
+    this.data = data;
+    this.code = data?.code ?? null;
   }
 }
 
@@ -71,7 +74,7 @@ async function request(method, path, { body, auth = false } = {}) {
     if (response.status === 401 && auth) {
       unauthorizedListeners.forEach((listener) => listener());
     }
-    throw new ApiError(response.status, data?.message || `Request failed (${response.status})`);
+    throw new ApiError(response.status, data?.message || `Request failed (${response.status})`, data);
   }
 
   return data;
@@ -84,6 +87,18 @@ export const api = {
   login: (email, password) =>
     request('POST', '/api/auth/login', { body: { email, password } }),
   me: () => request('GET', '/api/auth/me', { auth: true }),
+  verifyEmail: (email, otp) =>
+    request('POST', '/api/auth/verify-email', { body: { email, otp } }),
+  resendVerification: (email) =>
+    request('POST', '/api/auth/resend-verification', { body: { email } }),
+  getAuthProviders: () => request('GET', '/api/auth/providers'),
+  // Starts Better Auth's Google OAuth flow; returns { url } to redirect to.
+  startGoogleSignIn: ({ callbackURL, errorCallbackURL }) =>
+    request('POST', '/api/better-auth/sign-in/social', {
+      body: { provider: 'google', callbackURL, errorCallbackURL },
+    }),
+  // Exchanges the Better Auth session cookie for our login token.
+  completeGoogleSignIn: () => request('POST', '/api/auth/google/complete'),
   changePassword: (currentPassword, newPassword) =>
     request('PATCH', '/api/auth/change-password', {
       body: { currentPassword, newPassword },

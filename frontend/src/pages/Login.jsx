@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import FormField from '../components/FormField';
+import GoogleSignInButton from '../components/GoogleSignInButton';
+import VerifyEmailForm from '../components/VerifyEmailForm';
 import { InlineAlert } from '../components/StatusMessage';
 import { useAuth } from '../context/AuthContext';
 import { getSafeNext } from '../lib/redirect';
@@ -8,15 +10,19 @@ import { animatePageEnter } from '../animations/heroAnimations';
 
 export default function Login() {
   const pageRef = useRef(null);
-  const { user, login } = useAuth();
+  const { user, login, verifyEmail } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const next = getSafeNext(searchParams, '/book');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(() =>
+    searchParams.get('error') === 'google' ? "Google sign-in didn't complete. Please try again." : null,
+  );
   const [submitting, setSubmitting] = useState(false);
+  // Set when the password was right but the email still needs its code.
+  const [pendingEmail, setPendingEmail] = useState(null);
 
   useEffect(() => {
     if (!pageRef.current) return;
@@ -34,9 +40,18 @@ export default function Login() {
       await login(email, password);
       navigate(next, { replace: true });
     } catch (err) {
-      setError(err.message);
+      if (err.code === 'EMAIL_NOT_VERIFIED') {
+        setPendingEmail(err.data?.email ?? email);
+      } else {
+        setError(err.message);
+      }
       setSubmitting(false);
     }
+  };
+
+  const handleVerify = async (verifiedEmail, code) => {
+    await verifyEmail(verifiedEmail, code);
+    navigate(next, { replace: true });
   };
 
   return (
@@ -49,7 +64,21 @@ export default function Login() {
           </h1>
           <p className="mt-4 text-text-secondary">Log in to book courts and manage your bookings.</p>
 
-          <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+          {pendingEmail ? (
+            <div className="mt-10">
+              <VerifyEmailForm
+                email={pendingEmail}
+                onVerify={handleVerify}
+                onBack={() => setPendingEmail(null)}
+                notice="Your email isn't verified yet, so we've sent you a code."
+              />
+            </div>
+          ) : (
+          <>
+          <div className="mt-10">
+            <GoogleSignInButton next={next} />
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
             {error && <InlineAlert>{error}</InlineAlert>}
             <FormField id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
             <FormField id="password" label="Password" type="password" value={password} onChange={setPassword} autoComplete="current-password" />
@@ -61,6 +90,8 @@ export default function Login() {
               {submitting ? 'Logging in…' : 'Log In'}
             </button>
           </form>
+          </>
+          )}
 
           <p className="mt-8 text-sm text-text-secondary">
             New here?{' '}

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import FormField from '../components/FormField';
+import GoogleSignInButton from '../components/GoogleSignInButton';
+import VerifyEmailForm from '../components/VerifyEmailForm';
 import { InlineAlert } from '../components/StatusMessage';
 import { useAuth } from '../context/AuthContext';
 import { getSafeNext } from '../lib/redirect';
@@ -8,7 +10,7 @@ import { animatePageEnter } from '../animations/heroAnimations';
 
 export default function Register() {
   const pageRef = useRef(null);
-  const { user, register } = useAuth();
+  const { user, register, verifyEmail } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const next = getSafeNext(searchParams, '/book');
@@ -19,6 +21,8 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  // After sign-up: the address the verification code was sent to.
+  const [pendingEmail, setPendingEmail] = useState(null);
 
   useEffect(() => {
     if (!pageRef.current) return;
@@ -43,12 +47,18 @@ export default function Register() {
 
     setSubmitting(true);
     try {
-      await register(name, email, password);
-      navigate(next, { replace: true });
+      const result = await register(name, email, password);
+      setPendingEmail(result.email);
     } catch (err) {
       setError(err.message);
+    } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleVerify = async (verifiedEmail, code) => {
+    await verifyEmail(verifiedEmail, code);
+    navigate(next, { replace: true });
   };
 
   return (
@@ -61,7 +71,20 @@ export default function Register() {
           </h1>
           <p className="mt-4 text-text-secondary">Create an account to start booking courts.</p>
 
-          <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+          {pendingEmail ? (
+            <div className="mt-10">
+              <VerifyEmailForm
+                email={pendingEmail}
+                onVerify={handleVerify}
+                notice="Account created! Confirm your email to start booking."
+              />
+            </div>
+          ) : (
+          <>
+          <div className="mt-10">
+            <GoogleSignInButton next={next} label="Sign up with Google" />
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
             {error && <InlineAlert>{error}</InlineAlert>}
             <FormField id="name" label="Name" value={name} onChange={setName} autoComplete="name" />
             <FormField id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
@@ -92,6 +115,8 @@ export default function Register() {
               {submitting ? 'Creating account…' : 'Create Account'}
             </button>
           </form>
+          </>
+          )}
 
           <p className="mt-8 text-sm text-text-secondary">
             Already have an account?{' '}

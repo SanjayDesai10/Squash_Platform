@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import MyBookings from './pages/MyBookings';
 import Account from './pages/Account';
 import Admin from './pages/Admin';
+import GoogleCallback from './pages/GoogleCallback';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -37,6 +38,7 @@ export default function App() {
               <Route path="/book" element={<Booking />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/auth/google/callback" element={<GoogleCallback />} />
               <Route path="/bookings" element={<RequireAuth><MyBookings /></RequireAuth>} />
               <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
               <Route path="/admin" element={<RequireAuth role="admin"><Admin /></RequireAuth>} />

@@ -27,6 +27,30 @@ function getAccountLinks(user) {
   ];
 }
 
+/** Google profile photo when available, otherwise the name's initial. */
+function UserAvatar({ user, size }) {
+  const [failed, setFailed] = useState(false);
+  const box = size === 'lg' ? 'w-10 h-10 text-base' : 'w-8 h-8 text-sm';
+
+  if (user.image && !failed) {
+    return (
+      <img
+        src={user.image}
+        alt=""
+        className={`${box} object-cover`}
+        referrerPolicy="no-referrer"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+
+  return (
+    <span className={`${box} inline-flex items-center justify-center bg-accent text-on-accent font-heading font-bold`}>
+      {user.name.trim().charAt(0).toUpperCase()}
+    </span>
+  );
+}
+
 function ChevronIcon({ open }) {
   return (
     <svg
@@ -50,7 +74,6 @@ function AccountMenu({ user, onLogout }) {
   const menuRef = useRef(null);
   const location = useLocation();
   const links = getAccountLinks(user);
-  const initial = user.name.trim().charAt(0).toUpperCase();
 
   useEffect(() => { setOpen(false); }, [location]);
 
@@ -79,9 +102,7 @@ function AccountMenu({ user, onLogout }) {
           open ? 'border-accent-ink text-text-primary' : 'border-border text-text-secondary hover:text-text-primary hover:border-text-muted'
         }`}
       >
-        <span className="w-8 h-8 inline-flex items-center justify-center bg-accent text-on-accent font-heading font-bold text-sm">
-          {initial}
-        </span>
+        <UserAvatar user={user} />
         <span className="font-heading text-sm max-w-[8rem] truncate">{user.name.split(' ')[0]}</span>
         <ChevronIcon open={open} />
       </button>
@@ -276,9 +297,7 @@ export default function Navbar() {
         <div className="container py-8 flex flex-col min-h-full">
           {user && (
             <div className="flex items-center gap-3 pb-6 mb-2 border-b border-border">
-              <span className="w-10 h-10 inline-flex items-center justify-center bg-accent text-on-accent font-heading font-bold">
-                {user.name.trim().charAt(0).toUpperCase()}
-              </span>
+              <UserAvatar user={user} size="lg" />
               <div className="min-w-0">
                 <p className="font-heading font-semibold truncate">{user.name}</p>
                 <p className="text-xs text-text-muted truncate">{user.email}</p>

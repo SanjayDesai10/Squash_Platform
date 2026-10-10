@@ -29,17 +29,31 @@ export function AuthProvider({ children }) {
   // Expired / revoked token on any authenticated request → sign out.
   useEffect(() => onUnauthorized(logout), [logout]);
 
-  const login = useCallback(async (email, password) => {
-    const data = await api.login(email, password);
+  const startSession = useCallback((data) => {
     setToken(data.token);
     setUser(data.user);
     return data.user;
   }, []);
 
+  const login = useCallback(async (email, password) => {
+    return startSession(await api.login(email, password));
+  }, [startSession]);
+
+  /** Creates the account; resolves to { email } — a code is emailed next. */
   const register = useCallback(async (name, email, password) => {
-    await api.register(name, email, password);
-    return login(email, password);
-  }, [login]);
+    const data = await api.register(name, email, password);
+    return { email: data.email };
+  }, []);
+
+  /** Confirms the emailed code and logs the user in. */
+  const verifyEmail = useCallback(async (email, otp) => {
+    return startSession(await api.verifyEmail(email, otp));
+  }, [startSession]);
+
+  /** Finishes Google sign-in (after Google redirects back). */
+  const completeGoogleSignIn = useCallback(async () => {
+    return startSession(await api.completeGoogleSignIn());
+  }, [startSession]);
 
   const changePassword = useCallback(async (currentPassword, newPassword) => {
     const data = await api.changePassword(currentPassword, newPassword);
@@ -49,8 +63,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, login, register, logout, changePassword }),
-    [user, loading, login, register, logout, changePassword],
+    () => ({ user, loading, login, register, verifyEmail, completeGoogleSignIn, logout, changePassword }),
+    [user, loading, login, register, verifyEmail, completeGoogleSignIn, logout, changePassword],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
