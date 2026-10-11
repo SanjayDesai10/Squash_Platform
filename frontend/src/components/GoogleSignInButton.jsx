@@ -17,12 +17,24 @@ function GoogleLogo() {
  * "Continue with Google" — hidden until the backend reports Google
  * sign-in as configured. `next` is where to land after signing in.
  */
-export default function GoogleSignInButton({ next = '/book', label = 'Continue with Google' }) {
-  const { google } = useAuthProviders();
+/**
+ * `showDivider` adds the "or" separator above an email/password form.
+ * When it is the only sign-in option (`showDivider` false) and Google
+ * isn't configured, a notice is shown instead of nothing.
+ */
+export default function GoogleSignInButton({ next = '/book', label = 'Continue with Google', showDivider = true }) {
+  const { google, loaded } = useAuthProviders();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState(null);
 
-  if (!google) return null;
+  if (!google) {
+    if (showDivider || !loaded) return null;
+    return (
+      <p className="py-4 px-5 border border-border text-sm text-text-secondary" role="status">
+        Sign-in is temporarily unavailable. Please try again later.
+      </p>
+    );
+  }
 
   const handleClick = async () => {
     setError(null);
@@ -53,11 +65,13 @@ export default function GoogleSignInButton({ next = '/book', label = 'Continue w
       </button>
       {error && <p className="mt-2 text-sm text-danger" role="alert">{error}</p>}
 
-      <div className="my-8 flex items-center gap-4" aria-hidden="true">
-        <span className="h-px flex-1 bg-border" />
-        <span className="text-xs text-text-muted uppercase tracking-widest font-heading">or</span>
-        <span className="h-px flex-1 bg-border" />
-      </div>
+      {showDivider && (
+        <div className="my-8 flex items-center gap-4" aria-hidden="true">
+          <span className="h-px flex-1 bg-border" />
+          <span className="text-xs text-text-muted uppercase tracking-widest font-heading">or</span>
+          <span className="h-px flex-1 bg-border" />
+        </div>
+      )}
     </div>
   );
 }

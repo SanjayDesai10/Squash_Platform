@@ -6,6 +6,7 @@ import VerifyEmailForm from '../components/VerifyEmailForm';
 import { InlineAlert } from '../components/StatusMessage';
 import { useAuth } from '../context/AuthContext';
 import { getSafeNext } from '../lib/redirect';
+import { EMAIL_AUTH_ENABLED } from '../lib/features';
 import { animatePageEnter } from '../animations/heroAnimations';
 
 export default function Login() {
@@ -75,11 +76,12 @@ export default function Login() {
             </div>
           ) : (
           <>
-          <div className="mt-10">
-            <GoogleSignInButton next={next} />
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="mt-10 space-y-6">
             {error && <InlineAlert>{error}</InlineAlert>}
+            <GoogleSignInButton next={next} showDivider={EMAIL_AUTH_ENABLED} />
+          </div>
+          {EMAIL_AUTH_ENABLED && (
+          <form onSubmit={handleSubmit} className="space-y-6">
             <FormField id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
             <FormField id="password" label="Password" type="password" value={password} onChange={setPassword} autoComplete="current-password" />
             <button
@@ -90,6 +92,7 @@ export default function Login() {
               {submitting ? 'Logging in…' : 'Log In'}
             </button>
           </form>
+          )}
           </>
           )}
 

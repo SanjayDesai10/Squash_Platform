@@ -6,6 +6,7 @@ import VerifyEmailForm from '../components/VerifyEmailForm';
 import { InlineAlert } from '../components/StatusMessage';
 import { useAuth } from '../context/AuthContext';
 import { getSafeNext } from '../lib/redirect';
+import { EMAIL_AUTH_ENABLED } from '../lib/features';
 import { animatePageEnter } from '../animations/heroAnimations';
 
 export default function Register() {
@@ -69,7 +70,11 @@ export default function Register() {
           <h1 className="font-heading text-4xl sm:text-5xl font-bold mt-4">
             JOIN <span className="text-accent-ink">TBR</span>
           </h1>
-          <p className="mt-4 text-text-secondary">Create an account to start booking courts.</p>
+          <p className="mt-4 text-text-secondary">
+            {EMAIL_AUTH_ENABLED
+              ? 'Create an account to start booking courts.'
+              : 'Sign up with your Google account to start booking courts. It only takes a click.'}
+          </p>
 
           {pendingEmail ? (
             <div className="mt-10">
@@ -81,11 +86,12 @@ export default function Register() {
             </div>
           ) : (
           <>
-          <div className="mt-10">
-            <GoogleSignInButton next={next} label="Sign up with Google" />
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="mt-10 space-y-6">
             {error && <InlineAlert>{error}</InlineAlert>}
+            <GoogleSignInButton next={next} label="Sign up with Google" showDivider={EMAIL_AUTH_ENABLED} />
+          </div>
+          {EMAIL_AUTH_ENABLED && (
+          <form onSubmit={handleSubmit} className="space-y-6">
             <FormField id="name" label="Name" value={name} onChange={setName} autoComplete="name" />
             <FormField id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
             <FormField
@@ -115,6 +121,7 @@ export default function Register() {
               {submitting ? 'Creating account…' : 'Create Account'}
             </button>
           </form>
+          )}
           </>
           )}
 
