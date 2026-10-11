@@ -114,7 +114,7 @@ export default function Home() {
             {benefits.map((benefit, i) => (
               <div
                 key={benefit.title}
-                className="scroll-reveal group text-center p-8 border border-border transition-all duration-500 hover:border-border-accent-ink"
+                className="scroll-reveal group text-center p-8 border border-border transition-all duration-500 hover:border-border-accent"
                 style={{ opacity: 0 }}
               >
                 <div className="text-3xl mb-4 text-accent-ink opacity-60 group-hover:opacity-100 transition-opacity duration-500">

@@ -43,7 +43,7 @@ export default function CourtCard({ court, index = 0 }) {
   return (
     <div
       ref={cardRef}
-      className="group relative bg-bg-card border border-border p-6 md:p-8 transition-colors duration-500 hover:bg-bg-card-hover hover:border-border-accent-ink"
+      className="group relative bg-bg-card border border-border p-6 md:p-8 transition-colors duration-500 hover:bg-bg-card-hover hover:border-border-accent"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ willChange: 'transform' }}

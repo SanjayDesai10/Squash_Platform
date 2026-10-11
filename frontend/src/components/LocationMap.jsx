@@ -27,9 +27,12 @@ export default function LocationMap() {
   return (
     <section ref={sectionRef} className="section-y" aria-label="Location">
       <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16 items-center">
+        {/* Phones stack: info + directions → map → social links.
+            Desktop: info and social links in the left column, map on
+            the right spanning both rows. */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-x-16 lg:gap-y-10">
           {/* Info */}
-          <div className="lg:col-span-2 scroll-reveal" style={hidden}>
+          <div className="lg:col-span-2 lg:row-start-1 lg:self-end scroll-reveal" style={hidden}>
             <span className="section-label">Visit</span>
             <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mt-2">
               FIND <span className="text-accent-ink">US</span>
@@ -55,32 +58,33 @@ export default function LocationMap() {
             >
               Get Directions →
             </a>
-
-            <div className="mt-10">
-              <p className="text-xs text-text-muted uppercase tracking-widest font-heading mb-4">
-                Follow along for events &amp; updates
-              </p>
-              <SocialLinks variant="buttons" />
-            </div>
           </div>
 
           {/* Map */}
-          <div className="lg:col-span-3 scroll-reveal" style={hidden}>
+          <div className="lg:col-span-3 lg:col-start-3 lg:row-start-1 lg:row-span-2 lg:self-center scroll-reveal" style={hidden}>
             <div className="relative aspect-[4/3] md:aspect-[16/10] border border-border overflow-hidden bg-bg-card group">
               <iframe
                 src={MAP_EMBED_URL}
                 title="Map showing The Ball Room's location"
-                className="absolute inset-0 w-full h-full border-0 "
+                className="absolute inset-0 w-full h-full border-0"
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="strict-origin-when-cross-origin"
               />
               {/* Accent frame on hover */}
               <div
-                className="pointer-events-none absolute inset-0 border border-transparent group-hover:border-border-accent-ink transition-colors duration-500"
+                className="pointer-events-none absolute inset-0 border border-transparent group-hover:border-border-accent transition-colors duration-500"
                 aria-hidden="true"
               />
             </div>
+          </div>
+
+          {/* Social links */}
+          <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:self-start scroll-reveal" style={hidden}>
+            <p className="text-xs text-text-muted uppercase tracking-widest font-heading mb-4">
+              Follow along for events &amp; updates
+            </p>
+            <SocialLinks variant="buttons" />
           </div>
         </div>
       </div>
